@@ -1,0 +1,43 @@
+backend/
+│
+├── src/main/java/com/quizlly/
+│   ├── QuizllyApplication.java
+│   │
+│   ├── config/           # Security, CORS, configs
+│   │   ├── SecurityConfig.java
+│   │   └── CorsConfig.java
+│   │
+│   ├── controller/       # REST endpoints
+│   │   ├── AuthController.java
+│   │   ├── QuizController.java
+│   │   └── UserController.java
+│   │
+│   ├── service/          # Business logic
+│   │   ├── AuthService.java
+│   │   ├── QuizService.java
+│   │   └── UserService.java
+│   │
+│   ├── repository/       # DB access
+│   │   ├── UserRepository.java
+│   │   └── QuizRepository.java
+│   │
+│   ├── model/            # Database entities
+│   │   ├── User.java
+│   │   ├── Quiz.java
+│   │   └── Question.java
+│   │
+│   ├── dto/              # Request / Response DTOs
+│   │   ├── LoginRequest.java
+│   │   ├── QuizResponse.java
+│   │   └── RegisterRequest.java
+│   │
+│   ├── exception/        # Global error handling
+│   │   ├── GlobalExceptionHandler.java
+│   │   └── ApiError.java
+│   │
+│   └── util/             # Helpers
+│       └── JwtUtil.java
+│
+└── src/main/resources/
+    ├── application.yml
+    └── static/
