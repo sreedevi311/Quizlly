@@ -13,7 +13,6 @@ import java.util.List;
 public class ConceptExtractionService {
 
     public List<Concept> extractConcepts(String text, Content content) {
-
         List<Concept> concepts = new ArrayList<>();
 
         List<String> conceptKeywords = Arrays.asList(
@@ -23,28 +22,39 @@ public class ConceptExtractionService {
 
         for (String keyword : conceptKeywords) {
             if (text.toLowerCase().contains(keyword)) {
-
-                Concept concept = Concept.builder()
-                    .name(capitalizeFirstLetter(keyword))
-                    .description("Concept related to " + keyword)
-                    .content(content)
-                    .build();
-
+                Concept concept = new Concept();
+                concept.setName(capitalizeFirstLetter(keyword));
+                concept.setDescription("Concept related to " + keyword);
+                concept.setContextParagraph(extractContextParagraph(text, keyword));
+                concept.setSimplifiedExplanation("This is a fundamental concept in biology.");
+                concept.setContent(content);
+                
                 concepts.add(concept);
             }
         }
 
         if (concepts.isEmpty()) {
-            concepts.add(
-                Concept.builder()
-                    .name("General Knowledge")
-                    .description("General concepts from the content")
-                    .content(content)
-                    .build()
-            );
+            Concept defaultConcept = new Concept();
+            defaultConcept.setName("General Knowledge");
+            defaultConcept.setDescription("General concepts from the content");
+            defaultConcept.setContextParagraph(text.substring(0, Math.min(500, text.length())));
+            defaultConcept.setSimplifiedExplanation("General understanding of the topic");
+            defaultConcept.setContent(content);
+            
+            concepts.add(defaultConcept);
         }
 
         return concepts;
+    }
+
+    private String extractContextParagraph(String text, String keyword) {
+        String[] sentences = text.split("\\. ");
+        for (String sentence : sentences) {
+            if (sentence.toLowerCase().contains(keyword.toLowerCase())) {
+                return sentence + ".";
+            }
+        }
+        return text.substring(0, Math.min(200, text.length()));
     }
 
     private String capitalizeFirstLetter(String str) {

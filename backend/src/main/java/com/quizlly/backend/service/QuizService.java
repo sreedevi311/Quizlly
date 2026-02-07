@@ -43,12 +43,11 @@ public class QuizService {
         
         User currentUser = userService.getCurrentUser();
         
-        QuizAttempt attempt = QuizAttempt.builder()
-            .content(content)
-            .user(currentUser)
-            .timerEnabled(dto.timerEnabled())
-            .durationMinutes(dto.durationMinutes())
-            .build();
+        QuizAttempt attempt = new QuizAttempt();
+        attempt.setContent(content);
+        attempt.setUser(currentUser);
+        attempt.setTimerEnabled(dto.timerEnabled());
+        attempt.setDurationMinutes(dto.durationMinutes());
         
         attempt = attemptRepository.save(attempt);
         
@@ -79,13 +78,12 @@ public class QuizService {
         
         boolean isCorrect = evaluateAnswer(question, dto.answer());
         
-        QuestionResponse response = QuestionResponse.builder()
-            .attempt(attempt)
-            .question(question)
-            .userAnswer(dto.answer())
-            .isCorrect(isCorrect)
-            .pointsEarned(isCorrect ? 1 : 0)
-            .build();
+        QuestionResponse response = new QuestionResponse();
+        response.setAttempt(attempt);
+        response.setQuestion(question);
+        response.setUserAnswer(dto.answer());
+        response.setIsCorrect(isCorrect);
+        response.setPointsEarned(isCorrect ? 1 : 0);
         
         responseRepository.save(response);
         
@@ -138,7 +136,6 @@ public class QuizService {
         if (question.getType() == QuestionType.MCQ) {
             return question.getCorrectAnswer().trim().equalsIgnoreCase(userAnswer.trim());
         } else {
-            // For short answers, simple string matching (can be enhanced with NLP later)
             return question.getCorrectAnswer().toLowerCase().contains(userAnswer.toLowerCase());
         }
     }
@@ -160,14 +157,15 @@ public class QuizService {
             level = PerformanceLevel.WEAK;
         }
         
-        return ConceptScore.builder()
-            .attempt(attempt)
-            .concept(concept)
-            .correctAnswers(correctAnswers)
-            .totalQuestions(totalQuestions)
-            .accuracyPercentage(accuracy)
-            .level(level)
-            .build();
+        ConceptScore score = new ConceptScore();
+        score.setAttempt(attempt);
+        score.setConcept(concept);
+        score.setCorrectAnswers(correctAnswers);
+        score.setTotalQuestions(totalQuestions);
+        score.setAccuracyPercentage(accuracy);
+        score.setLevel(level);
+        
+        return score;
     }
     
     private QuizResultDTO generateQuizResult(QuizAttempt attempt, List<ConceptScore> conceptScores, List<QuestionResponse> responses) {

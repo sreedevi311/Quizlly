@@ -40,7 +40,10 @@ public ProcessedContentDTO processContent(ContentInputDTO input) {
             : input.text();
 
     // DO NOT PASS NON-EXISTENT FIELDS
-    Content content = Content.builder().build();
+    Content content = new Content();
+        content.setSourceText(contentText);
+        content.setSourceUrl(input.url());
+        content.setType(input.type());
     content = contentRepository.save(content);
 
     List<Concept> concepts =

@@ -1,3 +1,4 @@
+// src/main/java/com/quizlly/backend/service/UserService.java
 package com.quizlly.backend.service;
 
 import com.quizlly.backend.entity.User;
@@ -12,17 +13,16 @@ public class UserService {
     private UserRepository userRepository;
     
     public User getCurrentUser() {
-        // For MVP: Return a default user or create one if doesn't exist
         return userRepository.findById(1L)
-                .orElseGet(() -> createDefaultUser());
+                .orElseGet(this::createDefaultUser);
     }
     
     private User createDefaultUser() {
-        User defaultUser = User.builder()
-                .username("demo_user")
-                .email("demo@quizlly.com")
-                
-                .build();
+        User defaultUser = new User();
+        defaultUser.setUsername("demo_user");
+        defaultUser.setEmail("demo@quizlly.com");
+        defaultUser.setPassword("demo123");
+        
         return userRepository.save(defaultUser);
     }
     

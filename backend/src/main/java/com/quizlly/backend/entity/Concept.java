@@ -2,20 +2,13 @@
 package com.quizlly.backend.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "concepts")
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class Concept {
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -36,6 +29,30 @@ public class Concept {
     private Content content;
     
     @OneToMany(mappedBy = "concept", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
     private List<Question> questions = new ArrayList<>();
+
+    // Constructors
+    public Concept() {}
+
+    // Getters and Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+
+    public String getContextParagraph() { return contextParagraph; }
+    public void setContextParagraph(String contextParagraph) { this.contextParagraph = contextParagraph; }
+
+    public String getSimplifiedExplanation() { return simplifiedExplanation; }
+    public void setSimplifiedExplanation(String simplifiedExplanation) { this.simplifiedExplanation = simplifiedExplanation; }
+
+    public Content getContent() { return content; }
+    public void setContent(Content content) { this.content = content; }
+
+    public List<Question> getQuestions() { return questions; }
+    public void setQuestions(List<Question> questions) { this.questions = questions; }
 }

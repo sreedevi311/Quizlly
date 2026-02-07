@@ -15,12 +15,8 @@ import java.util.List;
 public class QuestionGenerationService {
     
     public List<Question> generateQuestions(Concept concept) {
-        // Template-based question generation for MVP
-        // TODO: Replace with AI-powered generation later
-        
         List<Question> questions = new ArrayList<>();
         
-        // Generate 3-5 questions per concept
         questions.add(generateDefinitionQuestion(concept));
         questions.add(generateApplicationQuestion(concept));
         questions.add(generateAnalysisQuestion(concept));
@@ -29,50 +25,53 @@ public class QuestionGenerationService {
     }
     
     private Question generateDefinitionQuestion(Concept concept) {
-        return Question.builder()
-            .concept(concept)
-            .questionText("What is " + concept.getName() + "?")
-            .type(QuestionType.MCQ)
-            .options(Arrays.asList(
-                concept.getDescription(),
-                "An unrelated process",
-                "A type of cell division",
-                "A chemical reaction"
-            ))
-            .correctAnswer(concept.getDescription())
-            .difficulty(DifficultyLevel.EASY)
-            .build();
+        Question question = new Question();
+        question.setConcept(concept);
+        question.setQuestionText("What is " + concept.getName() + "?");
+        question.setType(QuestionType.MCQ);
+        question.setOptions(Arrays.asList(
+            concept.getDescription(),
+            "An unrelated process",
+            "A type of cell division",
+            "A chemical reaction"
+        ));
+        question.setCorrectAnswer(concept.getDescription());
+        question.setDifficulty(DifficultyLevel.EASY);
+        
+        return question;
     }
     
     private Question generateApplicationQuestion(Concept concept) {
-        return Question.builder()
-            .concept(concept)
-            .questionText("How does " + concept.getName() + " work in biological systems?")
-            .type(QuestionType.MCQ)
-            .options(Arrays.asList(
-                "It involves multiple steps and processes",
-                "It happens instantly",
-                "It doesn't occur naturally",
-                "It only happens in labs"
-            ))
-            .correctAnswer("It involves multiple steps and processes")
-            .difficulty(DifficultyLevel.MEDIUM)
-            .build();
+        Question question = new Question();
+        question.setConcept(concept);
+        question.setQuestionText("How does " + concept.getName() + " work in biological systems?");
+        question.setType(QuestionType.MCQ);
+        question.setOptions(Arrays.asList(
+            "It involves multiple steps and processes",
+            "It happens instantly",
+            "It doesn't occur naturally",
+            "It only happens in labs"
+        ));
+        question.setCorrectAnswer("It involves multiple steps and processes");
+        question.setDifficulty(DifficultyLevel.MEDIUM);
+        
+        return question;
     }
     
     private Question generateAnalysisQuestion(Concept concept) {
-        return Question.builder()
-            .concept(concept)
-            .questionText("What is the primary function of " + concept.getName() + "?")
-            .type(QuestionType.MCQ)
-            .options(Arrays.asList(
-                "To maintain biological processes",
-                "To destroy cells",
-                "To create waste products",
-                "To stop growth"
-            ))
-            .correctAnswer("To maintain biological processes")
-            .difficulty(DifficultyLevel.HARD)
-            .build();
+        Question question = new Question();
+        question.setConcept(concept);
+        question.setQuestionText("What is the primary function of " + concept.getName() + "?");
+        question.setType(QuestionType.MCQ);
+        question.setOptions(Arrays.asList(
+            "To maintain biological processes",
+            "To destroy cells",
+            "To create waste products",
+            "To stop growth"
+        ));
+        question.setCorrectAnswer("To maintain biological processes");
+        question.setDifficulty(DifficultyLevel.HARD);
+        
+        return question;
     }
 }
