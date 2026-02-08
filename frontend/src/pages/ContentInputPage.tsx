@@ -1,21 +1,43 @@
 // src/pages/ContentInputPage.tsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { contentService } from '../services/contentService';
+import { ContentType } from '../types/content.types';
 
 const ContentInputPage: React.FC = () => {
   const [inputType, setInputType] = useState<'text' | 'url'>('text');
   const [content, setContent] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError(null);
     
-    // TODO: API call to process content
-    setTimeout(() => {
-      navigate('/content/1/concepts');
-    }, 1500);
+    try {
+      console.log('Submitting content:', { type: inputType, contentLength: content.length });
+      
+      // ACTUAL API CALL HERE!
+      const result = await contentService.processContent({
+        text: inputType === 'text' ? content : undefined,
+        url: inputType === 'url' ? content : undefined,
+        type: inputType === 'text' ? ContentType.TEXT : ContentType.URL,
+      });
+      
+      console.log('✅ Content processed successfully:', result);
+      console.log(`📊 Extracted ${result.concepts.length} concepts with ${result.totalQuestions} questions`);
+      
+      // Navigate to the REAL contentId from the response
+      navigate(`/content/${result.contentId}/concepts`);
+      
+    } catch (err: any) {
+      console.error('❌ Error processing content:', err);
+      setError(err.response?.data?.message || 'Failed to process content. Please check the backend is running.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -40,6 +62,7 @@ const ContentInputPage: React.FC = () => {
                   : 'text-gray-700 dark:text-gray-300 hover:bg-pink-50 dark:hover:bg-gray-700'
               }`}
               onClick={() => setInputType('text')}
+              type="button"
             >
               📝 Paste Text
             </button>
@@ -50,11 +73,22 @@ const ContentInputPage: React.FC = () => {
                   : 'text-gray-700 dark:text-gray-300 hover:bg-pink-50 dark:hover:bg-gray-700'
               }`}
               onClick={() => setInputType('url')}
+              type="button"
             >
               🔗 Provide URL
             </button>
           </div>
         </div>
+
+        {/* Error Message */}
+        {error && (
+          <div className="mb-6 bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-2xl p-4">
+            <p className="text-red-700 dark:text-red-400 font-semibold">❌ {error}</p>
+            <p className="text-red-600 dark:text-red-500 text-sm mt-2">
+              Make sure your backend is running at http://localhost:8080
+            </p>
+          </div>
+        )}
 
         {/* Input Form */}
         <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-8 border border-pink-100 dark:border-gray-700">
@@ -64,13 +98,20 @@ const ContentInputPage: React.FC = () => {
                 Educational Content
               </label>
               <textarea
-                placeholder="Paste your notes, articles, or study material here..."
+                placeholder="Paste your notes, articles, or study material here...
+
+Example:
+Photosynthesis is the process by which plants convert light energy into chemical energy. This process occurs in chloroplasts and involves chlorophyll..."
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 rows={15}
                 className="w-full px-6 py-4 border-2 border-pink-200 dark:border-gray-600 rounded-2xl focus:border-pink-500 focus:ring-4 focus:ring-pink-200 dark:focus:ring-pink-900 transition-all outline-none bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-lg"
                 required
+                minLength={50}
               />
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                {content.length} characters (minimum 50 required)
+              </p>
             </div>
           ) : (
             <div className="mb-6">
@@ -90,7 +131,7 @@ const ContentInputPage: React.FC = () => {
 
           <button 
             type="submit" 
-            disabled={loading}
+            disabled={loading || (inputType === 'text' && content.length < 50)}
             className="w-full py-4 bg-gradient-to-r from-pink-500 to-rose-500 text-white text-xl font-bold rounded-2xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
             {loading ? (
@@ -99,7 +140,7 @@ const ContentInputPage: React.FC = () => {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                 </svg>
-                Processing Content...
+                Processing Content... (Extracting Concepts & Generating Questions)
               </span>
             ) : (
               '✨ Generate Quiz'
@@ -117,8 +158,10 @@ const ContentInputPage: React.FC = () => {
             <li>• Paste at least 300 words for best results</li>
             <li>• Educational blogs and articles work perfectly</li>
             <li>• The more detailed the content, the better the questions</li>
+            <li>• Make sure your backend is running on port 8080</li>
           </ul>
         </div>
+
       </div>
     </div>
   );

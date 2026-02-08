@@ -1,12 +1,12 @@
 // hooks/useQuizSession.ts
 import { useState, useCallback } from 'react';
 import { quizService } from '../services/quizService';
-import type { QuizSession, Feedback } from '../types/quiz.types';
+import type { QuizSession, QuizResult } from '../types/quiz.types';
 
 export const useQuizSession = () => {
   const [session, setSession] = useState<QuizSession | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [feedback, setFeedback] = useState<Feedback[]>([]);
+  const [selectedAnswers, setSelectedAnswers] = useState<{ questionId: number; answer: string }[]>([]);
   const [loading, setLoading] = useState(false);
 
   const startQuiz = useCallback(async (contentId: number, timerEnabled: boolean, duration?: number) => {
@@ -15,7 +15,7 @@ export const useQuizSession = () => {
       const quizSession = await quizService.startQuiz(contentId, timerEnabled, duration);
       setSession(quizSession);
       setCurrentQuestionIndex(0);
-      setFeedback([]);
+      setSelectedAnswers([]);
     } catch (error) {
       console.error('Failed to start quiz:', error);
     } finally {
@@ -23,33 +23,38 @@ export const useQuizSession = () => {
     }
   }, []);
 
-  const submitAnswer = useCallback(async (questionId: number, answer: string) => {
-    if (!session) return;
-    
-    try {
-      const feedbackData = await quizService.submitAnswer(session.attemptId, questionId, answer);
-      setFeedback(prev => [...prev, feedbackData]);
-      
-      // Move to next question after a delay if incorrect
-      if (!feedbackData.isCorrect) {
-        setTimeout(() => {
-          setCurrentQuestionIndex(prev => prev + 1);
-        }, 3000);
-      } else {
-        setCurrentQuestionIndex(prev => prev + 1);
+  const submitAnswerLocally = useCallback((questionId: number, answer: string) => {
+    setSelectedAnswers(prev => {
+      const existing = prev.find(a => a.questionId === questionId);
+      if (existing) {
+        return prev.map(a => (a.questionId === questionId ? { questionId, answer } : a));
       }
+      return [...prev, { questionId, answer }];
+    });
+  }, []);
+
+  const completeQuiz = useCallback(async () => {
+    if (!session) return null;
+    setLoading(true);
+    try {
+      const result = await quizService.completeQuiz(session.attemptId, selectedAnswers);
+      return result;
     } catch (error) {
-      console.error('Failed to submit answer:', error);
+      console.error('Failed to complete quiz:', error);
+      return null;
+    } finally {
+      setLoading(false);
     }
-  }, [session]);
+  }, [session, selectedAnswers]);
 
   return {
     session,
     currentQuestionIndex,
-    feedback,
-    loading,
+    setCurrentQuestionIndex,
+    selectedAnswers,
     startQuiz,
-    submitAnswer,
+    submitAnswerLocally,
+    completeQuiz,
+    loading,
   };
 };
-

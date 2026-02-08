@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface QuestionRepository extends JpaRepository<Question, Long> {
     List<Question> findByConcept_Content_Id(Long contentId);
+    int countByConcept_Id(Long conceptId);
 }

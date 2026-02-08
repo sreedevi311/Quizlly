@@ -12,17 +12,9 @@ export const quizService = {
     return response.data;
   },
 
-  submitAnswer: async (attemptId: number, questionId: number, answer: string): Promise<Feedback> => {
-    const response = await api.post('/quiz/submit-answer', {
-      attemptId,
-      questionId,
-      answer,
-    });
-    return response.data;
-  },
-
-  completeQuiz: async (attemptId: number): Promise<QuizResult> => {
-    const response = await api.post(`/quiz/${attemptId}/complete`);
+  // Send all answers at once to complete the quiz
+  completeQuiz: async (attemptId: number, answers: { questionId: number; answer: string }[]): Promise<QuizResult> => {
+    const response = await api.post(`/quiz/${attemptId}/complete`, { answers });
     return response.data;
   },
 };

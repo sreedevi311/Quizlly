@@ -60,19 +60,24 @@ public ProcessedContentDTO processContent(ContentInputDTO input) {
     concepts = conceptRepository.findByContentId(content.getId());
 
     int totalQuestions = concepts.stream()
-            .mapToInt(c -> c.getQuestions().size())
-            .sum();
+        .mapToInt(c -> questionRepository.countByConcept_Id(c.getId()))
+        .sum();
+
 
     List<ConceptPerformanceDTO> conceptPerformance = concepts.stream()
             .map(c -> new ConceptPerformanceDTO(
-                    c.getName(),
-                    0,
-                    c.getQuestions().size(),
-                    0.0,
-                    PerformanceLevel.WEAK,
-                    List.of()
-            ))
+        c.getName(),
+        0,
+        questionRepository.countByConcept_Id(c.getId()),
+        0.0,
+        PerformanceLevel.WEAK,
+        List.of()
+))
+
             .collect(Collectors.toList());
+
+            System.out.println(content.getId() + ", " + conceptPerformance.size() + ", " + totalQuestions);
+
 
     return new ProcessedContentDTO(
             content.getId(),

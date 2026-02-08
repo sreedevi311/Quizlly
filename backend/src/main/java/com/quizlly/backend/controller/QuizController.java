@@ -1,5 +1,5 @@
 package com.quizlly.backend.controller;
-
+import java.util.List;
 import com.quizlly.backend.dto.request.StartQuizDTO;
 import com.quizlly.backend.dto.request.SubmitAnswerDTO;
 import com.quizlly.backend.dto.response.FeedbackDTO;
@@ -12,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/quiz")
+@RequestMapping("api/quiz")
 public class QuizController {
 
     @Autowired
@@ -24,15 +24,11 @@ public class QuizController {
         return ResponseEntity.ok(quizService.startQuiz(dto));
     }
 
-    @PostMapping("/submit-answer")
-    public ResponseEntity<FeedbackDTO> submitAnswer(
-            @RequestBody SubmitAnswerDTO dto) {
-        return ResponseEntity.ok(quizService.submitAnswer(dto));
-    }
-
     @PostMapping("/{attemptId}/complete")
     public ResponseEntity<QuizResultDTO> completeQuiz(
-            @PathVariable Long attemptId) {
-        return ResponseEntity.ok(quizService.completeQuiz(attemptId));
+            @PathVariable Long attemptId,
+            @RequestBody List<SubmitAnswerDTO> answers) {  // <- new
+        return ResponseEntity.ok(quizService.completeQuiz(attemptId, answers));
     }
+
 }

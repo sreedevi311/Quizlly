@@ -1,51 +1,32 @@
-// types/quiz.types.ts
-export type QuestionType = 'MCQ' | 'SHORT_ANSWER';
-
-export type PerformanceLevel = 'WEAK' | 'MODERATE' | 'STRONG';
+// src/types/quiz.types.ts
 
 export interface Question {
   id: number;
-  conceptId: number;
-  conceptName: string;
-  questionText: string;
-  type: 'MCQ' | 'SHORT_ANSWER';
-  options?: string[];
-  difficulty: string;
+  concept: string;
+  text: string;
+  options: string[];
+  correctAnswer?: string; // optional if server doesn’t send correct answer
+}
+
+export interface QuizResult {
+  attemptId: number;
+  totalScore: number;
+  questionResults: {
+    questionId: number;
+    correctAnswer: string;
+    userAnswer: string;
+    isCorrect: boolean;
+  }[];
 }
 
 export interface QuizSession {
   attemptId: number;
-  contentId: number;
   questions: Question[];
-  startedAt: string;
-  durationMinutes?: number;
-  timerEnabled: boolean;
 }
 
 export interface Feedback {
   questionId: number;
   isCorrect: boolean;
-  correctAnswer?: string;
-  contextParagraph?: string;
-  simplifiedExplanation?: string;
-  conceptName?: string;
-}
-
-export interface ConceptPerformance {
-  conceptName: string;
-  correctAnswers: number;
-  totalQuestions: number;
-  accuracy: number;
-  level: PerformanceLevel;
-  relearningLinks: string[];
-}
-
-export interface QuizResult {
-  totalScore: number;
-  maxScore: number;
-  overallAccuracy: number;
-  conceptPerformance: ConceptPerformance[];
-  wrongAnswerFeedback: Feedback[];
-  gamifiedTitle: string;
-  overallSummary: string;
+  correctAnswer: string;
+  explanation?: string; // optional explanation for the answer
 }

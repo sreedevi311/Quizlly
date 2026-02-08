@@ -1,21 +1,65 @@
 // src/pages/ConceptReviewPage.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { contentService } from '../services/contentService';
+import type { ConceptDTO } from '../types/content.types';
 
 const ConceptReviewPage: React.FC = () => {
   const { contentId } = useParams<{ contentId: string }>();
   const navigate = useNavigate();
   const [timerEnabled, setTimerEnabled] = useState(false);
+  const [concepts, setConcepts] = useState<ConceptDTO[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Mock data - replace with API call
-  const concepts = [
-    { id: 1, name: 'Photosynthesis', questionCount: 5, difficulty: 'Medium' },
-    { id: 2, name: 'Cellular Respiration', questionCount: 4, difficulty: 'Hard' },
-    { id: 3, name: 'Plant Structure', questionCount: 3, difficulty: 'Easy' },
-    { id: 4, name: 'Chloroplast Function', questionCount: 4, difficulty: 'Medium' },
-  ];
+  useEffect(() => {
+    const fetchConcepts = async () => {
+      if (!contentId) return;
+      
+      try {
+        setLoading(true);
+        const data = await contentService.getConceptsByContentId(Number(contentId));
+        setConcepts(data);
+      } catch (err) {
+        console.error('Error fetching concepts:', err);
+        setError('Failed to load concepts. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchConcepts();
+  }, [contentId]);
 
   const totalQuestions = concepts.reduce((sum, c) => sum + c.questionCount, 0);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-6xl mb-4">⏳</div>
+          <p className="text-xl text-gray-600 dark:text-gray-400">Loading concepts...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-6xl mb-4">❌</div>
+          <p className="text-xl text-red-600 dark:text-red-400">{error}</p>
+          <button
+            onClick={() => navigate('/input')}
+            className="mt-4 px-6 py-3 bg-pink-500 text-white rounded-lg"
+          >
+            Go Back
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-rose-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-12 px-4">
@@ -39,19 +83,13 @@ const ConceptReviewPage: React.FC = () => {
             >
               <div className="flex items-start justify-between mb-3">
                 <h3 className="text-xl font-bold text-gray-800 dark:text-white flex items-center">
-                  <span className="text-3xl mr-3">{index === 0 ? '🌱' : index === 1 ? '⚡' : index === 2 ? '🌿' : '🔬'}</span>
+                  <span className="text-3xl mr-3">
+                    {index % 4 === 0 ? '🌱' : index % 4 === 1 ? '⚡' : index % 4 === 2 ? '🌿' : '🔬'}
+                  </span>
                   {concept.name}
                 </h3>
-                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                  concept.difficulty === 'Easy' 
-                    ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' 
-                    : concept.difficulty === 'Medium'
-                    ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300'
-                    : 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300'
-                }`}>
-                  {concept.difficulty}
-                </span>
               </div>
+              <p className="text-gray-600 dark:text-gray-400 mb-2">{concept.description}</p>
               <p className="text-gray-600 dark:text-gray-400">
                 <span className="font-semibold text-pink-600">{concept.questionCount}</span> questions prepared
               </p>

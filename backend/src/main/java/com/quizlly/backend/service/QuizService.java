@@ -25,6 +25,10 @@ public class QuizService {
     private QuizAttemptRepository attemptRepository;
     
     @Autowired
+private QuestionGenerationService questionGenerationService;
+
+
+    @Autowired
     private QuestionRepository questionRepository;
     
     @Autowired
@@ -102,7 +106,7 @@ public class QuizService {
     }
     
     @Transactional
-    public QuizResultDTO completeQuiz(Long attemptId) {
+    public QuizResultDTO completeQuiz(Long attemptId, List<SubmitAnswerDTO> answers) {
         QuizAttempt attempt = attemptRepository.findById(attemptId)
             .orElseThrow(() -> new ResourceNotFoundException("Quiz attempt not found"));
         
