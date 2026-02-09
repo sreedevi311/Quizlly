@@ -15,10 +15,11 @@ export interface ContentInputDTO {
 }
 
 export interface ConceptDTO {
-  id: number;
-  name: string;
-  description: string;
-  questionCount: number;
+  conceptName: string;
+  correctAnswers: number;
+  totalQuestions: number;
+  accuracy: number;
+  level: 'WEAK' | 'AVERAGE' | 'STRONG';
 }
 
 export interface ProcessedContentDTO {

@@ -66,9 +66,9 @@ const QuizPage: React.FC = () => {
         {/* Header with Timer */}
         <div className="flex justify-between items-center mb-8">
           <div className="bg-white dark:bg-gray-800 rounded-full px-6 py-3 shadow-lg border border-pink-200 dark:border-gray-700">
-            <span>Question </span>
+            <span className='font-bold text-white'>Question </span>
             <span className="font-bold text-pink-600">{currentQuestionIndex + 1}</span>
-            <span> of {session.questions.length}</span>
+            <span className='font-bold text-white'> of {session.questions.length}</span>
           </div>
 
           <div className="bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-full px-6 py-3 shadow-lg font-bold">
